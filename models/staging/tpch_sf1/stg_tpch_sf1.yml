@@ -1,0 +1,125 @@
+version: 2
+
+
+sources:
+  - name: tpch_sf1
+    database: snowflake_sample_data
+    schema: TPCH_SF1
+    tables:
+      - name: customer
+      - name: lineitem
+      - name: nation
+      - name: orders
+      - name: part
+      - name: partsupp
+      - name: region
+      - name: supplier
+
+models:
+  - name: stg_tpch_sf1__customer
+    columns:
+      - name: C_CUSTKEY
+        tests:
+          - unique
+          - not_null
+      - name: C_NATIONKEY
+        tests:
+          - relationships:
+              to: ref('nation')
+              field: N_NATIONKEY
+
+  - name: stg_tpch_sf1__lineitem
+    columns:
+      - name: L_ORDERKEY
+        tests:
+          - not_null
+          - relationships:
+              to: ref('orders')
+              field: O_ORDERKEY
+      - name: L_PARTKEY
+        tests:
+          - not_null
+          - relationships:
+              to: ref('part')
+              field: P_PARTKEY
+      - name: L_SUPPKEY
+        tests:
+          - not_null
+          - relationships:
+              to: ref('supplier')
+              field: S_SUPPKEY
+    config:
+      materialized: incremental
+      incremental_strategy: merge
+      unique_key : ['l_orderkey','L_LINENUMBER']
+
+  - name: stg_tpch_sf1__nation
+    columns:
+      - name: N_NATIONKEY
+        tests:
+          - unique
+          - not_null
+      - name: N_REGIONKEY
+        tests:
+          - not_null
+          - relationships:
+              to: ref('region')
+              field: R_REGIONKEY
+
+  - name: stg_tpch_sf1__orders
+    columns:
+      - name: O_ORDERKEY
+        tests:
+          - not_null
+      - name: O_CUSTKEY
+        tests:
+          - not_null
+          - relationships:
+              to: ref('customer')
+              field: C_CUSTKEY
+    config:
+      materialized: incremental
+      incremental_strategy: merge
+      unique_key: O_ORDERKEY
+
+  - name: stg_tpch_sf1__part
+    columns:
+      - name: P_PARTKEY
+        tests:
+          - unique
+          - not_null
+
+  - name: stg_tpch_sf1__partsupp
+    columns:
+      - name: PS_PARTKEY
+        tests:
+          - not_null
+          - relationships:
+              to: ref('part')
+              field: P_PARTKEY
+      - name: PS_SUPPKEY
+        tests:
+          - not_null
+          - relationships:
+              to: ref('supplier')
+              field: S_SUPPKEY
+
+  - name: stg_tpch_sf1__region
+    columns:
+      - name: R_REGIONKEY
+        tests:
+          - unique
+          - not_null
+
+  - name: stg_tpch_sf1__supplier
+    columns:
+      - name: S_SUPPKEY
+        tests:
+          - unique
+          - not_null
+      - name: S_NATIONKEY
+        tests:
+          - not_null
+          - relationships:
+              to: ref('nation')
+              field: N_NATIONKEY
