@@ -1,0 +1,13 @@
+outputs:
+    default:
+      type: snowflake
+      account: NMYVCHW.LX39757
+      ## User/password auth ##
+      user: ALEXMOR22
+      password: Ora60alex
+
+      role: ACCOUNT
+      database: ACCOUNTADMIN
+      warehouse: COMPUTE_WH
+      schema: DBT_AMORENO
+      threads: 4

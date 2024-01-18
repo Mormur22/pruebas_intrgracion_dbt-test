@@ -44,3 +44,5 @@ models:
     business:
       materialized: table
       schema: BUS
+    elementary:
+      +schema: "elementary"
